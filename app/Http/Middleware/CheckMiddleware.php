@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class CheckMiddleware
 {
@@ -24,9 +25,10 @@ class CheckMiddleware
             if (count($parts) === 2 && $parts[0] === 'Bearer') {
                 $token = $parts[1];
                 try {
-                    $GLOBALS['user_id']=1;
-                    // $key=env('JWT_SECRET');
-                    // $decoded = JWT::decode($token, $key, ['HS256']); // Menggunakan metode decode yang benar
+                    
+                    $key=env('JWT_SECRET');
+                    $decoded = JWT::decode($token, new Key($key, 'HS256'));
+                    $GLOBALS['user_id']=$decoded->data->userId;
                     // $request->attributes->set('decoded_token', $decoded);
                     return $next($request);
                 } catch (\Exception $e) {
